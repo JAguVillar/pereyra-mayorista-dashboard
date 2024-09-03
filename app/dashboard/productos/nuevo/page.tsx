@@ -16,29 +16,68 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from "@/components/ui/select"
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Separator } from "@/components/ui/separator"
+
+import categorias from '@/lib/datasets/tipoPorductos.js'
+import Variante from "@/components/variantes/variante"
+import { useState } from "react"
+
+
 
 //Definimos el schema con zod https://zod.dev/
 const formSchema = z.object({
     nombre: z.string(),
     descripcion: z.string(),
     marca: z.string(),
+    color: z.string(),
+    talle: z.string(),
 })
 
+
+
 export default function Page({ children }: { children: React.ReactNode }) {
+    const [variantes, setVariantes] = useState<{ id: string }[]>([]);
+
+
     // 1. Definimos el form
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             nombre: "",
             descripcion: "",
-            marca: ""
+            marca: "",
+            color: "",
+            talle: "",
         }
     })
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
-        // Do something with the form values.
-        // ✅ This will be type-safe and validated.
-        console.log(values)
+    function onSubmit() {
+
+    }
+
+    function agregarNuevaVariante() {
+        setVariantes((variantesActuales) => {
+            return [
+                ...variantesActuales,
+                {
+                    id: crypto.randomUUID()
+                }
+            ]
+        })
+    }
+
+    function eliminarVariante(id) {
+        console.log(id);
+
     }
 
     return (
@@ -82,9 +121,14 @@ export default function Page({ children }: { children: React.ReactNode }) {
                                         <SelectValue placeholder="Theme" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="light">Light</SelectItem>
-                                        <SelectItem value="dark">Dark</SelectItem>
-                                        <SelectItem value="system">System</SelectItem>
+                                        {
+                                            categorias?.map((item, index) => {
+                                                return (
+                                                    <SelectItem value={`${item.id}`} key={index}>{item.nombre}</SelectItem>
+
+                                                )
+                                            })
+                                        }
                                     </SelectContent>
                                 </Select>
                             </FormControl>
@@ -92,6 +136,30 @@ export default function Page({ children }: { children: React.ReactNode }) {
                         </FormItem>
                     )}
                 />
+                <Card x-chunk="dashboard-06-chunk-0">
+                    <CardHeader>
+                        <CardTitle>Variantes</CardTitle>
+                        <CardDescription>
+                            Sumá color, fotos, tallas de la guía seleccionada, cantidad y otros datos específicos para cada variante de tu producto.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Badge variant="secondary">Variante principal</Badge>
+                        {
+                            variantes?.map((item, index) => {
+                                return (
+                                    <Variante onEliminar={eliminarVariante} id={item.id} key={index} />
+                                )
+                            })
+                        }
+
+                    </CardContent>
+                    <CardFooter>
+
+                        <Button variant="secondary" onClick={() => agregarNuevaVariante()}>Agregar otra variante</Button>
+                    </CardFooter>
+
+                </Card>
                 <Button type="submit">Submit</Button>
             </form>
         </Form>
