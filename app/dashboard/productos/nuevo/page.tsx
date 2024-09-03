@@ -75,7 +75,7 @@ export default function Page({ children }: { children: React.ReactNode }) {
         })
     }
 
-    function eliminarVariante(id) {
+    function eliminarVariante(id: string) {
         console.log(id);
 
     }
